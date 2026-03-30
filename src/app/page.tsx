@@ -221,10 +221,18 @@ Be precise, reference price levels, think smart money. Keep it concise.`;
     addMessage('assistant', `Ready. I can analyze ${symbol} ${timeframe} using ICT/SMC concepts and generate signals with entry, SL, and TP plotted on the chart.\n\nTo enable live trading:\n→ Go to the MT5 tab\n→ Copy the Python bridge code\n→ Run it locally\n→ Test the connection\n\nTry: "Analyze the current chart and give me a trade setup"`);
   }, []);
 
-  const [mobilePanel, setMobilePanel] = useState('chart'); // 'chat', 'chart', 'panel'
+  const [mobilePanel, setMobilePanel] = useState('chart');
+
+  const watchlist = [
+    { symbol: 'XAUUSD', change: '+0.42%', up: true },
+    { symbol: 'EURUSD', change: '-0.18%', up: false },
+    { symbol: 'GBPUSD', change: '+0.25%', up: true },
+    { symbol: 'BTCUSD', change: '+1.24%', up: true },
+    { symbol: 'NAS100', change: '-0.45%', up: false },
+  ];
 
   return (
-    <div className="h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] overflow-hidden flex flex-col">
+    <div className="h-screen bg-[#0f0f0f] text-white overflow-hidden flex flex-col">
       <Toolbar
         symbol={symbol}
         setSymbol={setSymbol}
@@ -235,43 +243,96 @@ Be precise, reference price levels, think smart money. Keep it concise.`;
         checkMT5={checkMT5}
       />
       
-      {/* Desktop Layout */}
+      {/* Desktop Layout - Neural Design */}
       <div className="hidden lg:flex flex-1 overflow-hidden">
-        <AIAnalyst
-          messages={messages}
-          loading={loading}
-          onSendMessage={sendMessage}
-        />
-        
-        <TradingChart
-          symbol={symbol}
-          timeframe={timeframe}
-          candles={candles}
-          signal={signal}
-          chartContainerRef={chartContainerRef}
-        />
-        
-        <RightPanel
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          signal={signal}
-          positions={positions}
-          mt5Online={mt5Online}
-          mt5Url={mt5Url}
-          setMt5Url={setMt5Url}
-          checkMT5={checkMT5}
-          placeTrade={placeTrade}
-          setSignal={setSignal}
-          symbol={symbol}
-        />
+        {/* Left Sidebar - Watchlist */}
+        <div className="w-60 flex-shrink-0 bg-[#1a1a1a] border-r border-[#00f5ff]/10 p-4 flex flex-col">
+          <h3 className="text-xs uppercase tracking-widest text-gray-500 mb-4 font-medium">Watchlist</h3>
+          <div className="space-y-1">
+            {watchlist.map((item) => (
+              <div 
+                key={item.symbol}
+                onClick={() => setSymbol(item.symbol)}
+                className={`flex justify-between items-center p-3 rounded-xl cursor-pointer transition-all ${
+                  symbol === item.symbol 
+                    ? 'bg-[#00f5ff]/10 border border-[#00f5ff]/30' 
+                    : 'hover:bg-[#252525]'
+                }`}
+              >
+                <span className="font-mono font-medium text-sm">{item.symbol}</span>
+                <span className={`text-xs font-medium ${item.up ? 'text-green-400' : 'text-red-400'}`}>
+                  {item.change}
+                </span>
+              </div>
+            ))}
+          </div>
+          
+          <h3 className="text-xs uppercase tracking-widest text-gray-500 mb-4 mt-8 font-medium">Recent Signals</h3>
+          <div className="text-xs text-gray-500 bg-[#252525] p-3 rounded-xl">
+            {signal ? (
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${signal.dir === 'buy' ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                <span className="text-white font-medium">{signal.dir.toUpperCase()} {symbol}</span>
+                <span className="text-gray-400">@{signal.entry}</span>
+              </div>
+            ) : (
+              'No signals yet • AI is analyzing...'
+            )}
+          </div>
+        </div>
+
+        {/* Main Chart Area */}
+        <div className="flex-1 flex flex-col bg-[#0f0f0f]">
+          <div className="flex-1 bg-[#111] border border-[#00f5ff]/10 m-4 rounded-3xl relative overflow-hidden">
+            <TradingChart
+              symbol={symbol}
+              timeframe={timeframe}
+              candles={candles}
+              signal={signal}
+              chartContainerRef={chartContainerRef}
+            />
+          </div>
+          
+          {/* Quick AI Summary */}
+          <div className="mx-4 mb-4 bg-[#1a1a1a] rounded-3xl p-4 grid grid-cols-3 gap-4 text-sm border border-[#00f5ff]/10">
+            <div className="text-center border-r border-[#00f5ff]/10">
+              <p className="text-green-400 text-xs mb-1">Market Bias</p>
+              <p className="text-xl font-mono font-bold">Bullish</p>
+            </div>
+            <div className="text-center border-r border-[#00f5ff]/10">
+              <p className="text-amber-400 text-xs mb-1">Structure</p>
+              <p className="text-xl font-mono font-bold">Order Block</p>
+            </div>
+            <div className="text-center">
+              <p className="text-[#00f5ff] text-xs mb-1">Next Target</p>
+              <p className="text-xl font-mono font-bold">3,145.00</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Panel - AI Chat */}
+        <div className="w-80 flex-shrink-0 bg-[#1a1a1a] border-l border-[#00f5ff]/10">
+          <RightPanel
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            signal={signal}
+            positions={positions}
+            mt5Online={mt5Online}
+            mt5Url={mt5Url}
+            setMt5Url={setMt5Url}
+            checkMT5={checkMT5}
+            placeTrade={placeTrade}
+            setSignal={setSignal}
+            symbol={symbol}
+          />
+        </div>
       </div>
 
       {/* Mobile/Tablet Layout */}
       <div className="lg:hidden flex-1 flex flex-col overflow-hidden">
-        {/* Main Content Area */}
         <div className="flex-1 overflow-hidden relative">
           {mobilePanel === 'chat' && (
-            <div className="absolute inset-0 animate-spring">
+            <div className="absolute inset-0">
               <AIAnalyst
                 messages={messages}
                 loading={loading}
@@ -283,18 +344,20 @@ Be precise, reference price levels, think smart money. Keep it concise.`;
           )}
           
           {mobilePanel === 'chart' && (
-            <TradingChart
-              symbol={symbol}
-              timeframe={timeframe}
-              candles={candles}
-              signal={signal}
-              chartContainerRef={chartContainerRef}
-              isMobile
-            />
+            <div className="h-full bg-[#111] border border-[#00f5ff]/10 m-2 rounded-2xl">
+              <TradingChart
+                symbol={symbol}
+                timeframe={timeframe}
+                candles={candles}
+                signal={signal}
+                chartContainerRef={chartContainerRef}
+                isMobile
+              />
+            </div>
           )}
           
           {mobilePanel === 'panel' && (
-            <div className="absolute inset-0 animate-spring">
+            <div className="absolute inset-0">
               <RightPanel
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
@@ -315,30 +378,23 @@ Be precise, reference price levels, think smart money. Keep it concise.`;
         </div>
 
         {/* Mobile Tab Bar */}
-        <div className="flex bg-[var(--bg-secondary)] border-t border-[var(--separator)] safe-area-bottom">
+        <div className="flex bg-[#1a1a1a] border-t border-[#00f5ff]/20 pb-safe">
           <button
             onClick={() => setMobilePanel('chat')}
-            className={`flex-1 flex flex-col items-center py-2.5 gap-1 transition-all ${
-              mobilePanel === 'chat' 
-                ? 'text-[var(--system-blue)]' 
-                : 'text-[var(--text-tertiary)]'
+            className={`flex-1 flex flex-col items-center py-3 gap-1 transition-all ${
+              mobilePanel === 'chat' ? 'text-[#00f5ff]' : 'text-gray-500'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
             <span className="text-[10px] font-medium">AI Chat</span>
-            {messages.length > 0 && (
-              <span className="absolute top-1 right-[33%] w-2 h-2 bg-[var(--system-blue)] rounded-full" />
-            )}
           </button>
           
           <button
             onClick={() => setMobilePanel('chart')}
-            className={`flex-1 flex flex-col items-center py-2.5 gap-1 transition-all ${
-              mobilePanel === 'chart' 
-                ? 'text-[var(--system-blue)]' 
-                : 'text-[var(--text-tertiary)]'
+            className={`flex-1 flex flex-col items-center py-3 gap-1 transition-all ${
+              mobilePanel === 'chart' ? 'text-[#00f5ff]' : 'text-gray-500'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -349,10 +405,8 @@ Be precise, reference price levels, think smart money. Keep it concise.`;
           
           <button
             onClick={() => setMobilePanel('panel')}
-            className={`flex-1 flex flex-col items-center py-2.5 gap-1 transition-all relative ${
-              mobilePanel === 'panel' 
-                ? 'text-[var(--system-blue)]' 
-                : 'text-[var(--text-tertiary)]'
+            className={`flex-1 flex flex-col items-center py-3 gap-1 transition-all relative ${
+              mobilePanel === 'panel' ? 'text-[#00f5ff]' : 'text-gray-500'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -360,9 +414,33 @@ Be precise, reference price levels, think smart money. Keep it concise.`;
             </svg>
             <span className="text-[10px] font-medium">Signals</span>
             {signal && (
-              <span className="absolute top-1 right-[33%] w-2 h-2 bg-[var(--bullish)] rounded-full animate-pulse" />
+              <span className="absolute top-2 right-[33%] w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             )}
           </button>
+        </div>
+      </div>
+
+      {/* Bottom Status Bar */}
+      <div className="hidden lg:flex items-center justify-between px-6 py-3 bg-[#1a1a1a] border-t border-[#00f5ff]/10 text-xs">
+        <div className="flex items-center gap-4">
+          {signal ? (
+            <div className="flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full ${signal.dir === 'buy' ? 'bg-green-400 animate-pulse' : 'bg-red-400 animate-pulse'}`}></span>
+              <span className="font-medium text-white">Signal: {signal.dir === 'buy' ? 'Strong Buy' : 'Strong Sell'}</span>
+              <span className="text-gray-500">•</span>
+              <span className="text-[#00f5ff]">{signal.conf}% confidence</span>
+              <span className="text-gray-500">•</span>
+              <span className="text-gray-400">Entry: {signal.entry}</span>
+            </div>
+          ) : (
+            <span className="text-gray-500">No active signal • Ask AI to analyze</span>
+          )}
+        </div>
+        <div className="flex items-center gap-4 text-gray-500">
+          <span className={mt5Online ? 'text-green-400' : 'text-red-400'}>
+            {mt5Online ? '● MT5 Connected' : '● MT5 Disconnected'}
+          </span>
+          <span>Ready to analyze</span>
         </div>
       </div>
     </div>

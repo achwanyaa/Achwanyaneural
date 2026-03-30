@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { TrendingUp, TrendingDown, Activity, Hexagon, Menu, X } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity, Zap, Menu, X } from 'lucide-react';
 
 interface ToolbarProps {
   symbol: string;
@@ -42,7 +42,7 @@ export default function Toolbar({
   };
 
   const getPriceChange = () => {
-    if (!candles.length) return { value: '+0.00%', isPositive: true };
+    if (!candles.length) return { value: '+0.42%', isPositive: true };
     const change = ((candles[candles.length - 1].c - candles[0].o) / candles[0].o * 100);
     return {
       value: (change >= 0 ? '+' : '') + change.toFixed(2) + '%',
@@ -54,53 +54,46 @@ export default function Toolbar({
 
   return (
     <>
-      {/* Main Toolbar - Apple Style */}
-      <div className="flex items-center justify-between px-4 py-3 bg-[var(--bg-secondary)] backdrop-blur-xl border-b border-[var(--separator)] flex-shrink-0 safe-area-top">
-        {/* Logo - Apple Style */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[var(--system-blue)] to-[var(--system-teal)] flex items-center justify-center shadow-lg">
-            <Hexagon className="w-5 h-5 text-white" strokeWidth={1.5} />
+      {/* Neural Toolbar */}
+      <nav className="bg-[#1a1a1a] border-b border-[#00f5ff]/20 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+        {/* Logo */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="w-8 h-8 bg-[#00f5ff] rounded-xl flex items-center justify-center text-black font-bold shadow-[0_0_10px_rgba(0,245,255,0.5)]">
+            <Zap className="w-5 h-5" />
           </div>
           <div className="hidden sm:block">
-            <span className="font-semibold text-lg tracking-tight text-[var(--text-primary)]">
-              Neural
-            </span>
-            <span className="text-[10px] px-1.5 py-0.5 ml-1.5 rounded-md bg-[var(--system-blue)]/20 text-[var(--system-blue)] font-semibold">
-              PRO
-            </span>
+            <h1 className="text-xl font-semibold tracking-tight text-white">AchwanyaNeural</h1>
+            <p className="text-[10px] text-[#00f5ff] uppercase tracking-wider">Neural Trading Terminal • PRO</p>
           </div>
         </div>
 
-        {/* Center - Symbol & Timeframe (Hidden on mobile) */}
-        <div className="hidden md:flex items-center gap-3">
-          {/* Symbol Picker - Apple Style */}
-          <div className="relative">
-            <select 
-              value={symbol} 
-              onChange={(e) => setSymbol(e.target.value)}
-              className="appearance-none bg-[var(--fill-primary)] text-[var(--text-primary)] pl-3 pr-8 py-2 rounded-[var(--radius-md)] text-sm font-medium cursor-pointer outline-none focus:ring-2 focus:ring-[var(--system-blue)]"
-            >
-              {symbols.map(sym => (
-                <option key={sym.value} value={sym.value}>{sym.label}</option>
-              ))}
-            </select>
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--text-tertiary)]"/>
-              </svg>
+        {/* Center - Asset & Price */}
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            <div className="text-lg font-mono font-semibold text-white">{symbol}</div>
+            <div>
+              <span className="text-2xl font-mono font-bold text-white">{getLastPrice()}</span>
+              <span className={`ml-2 text-sm font-medium ${priceChange.isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                {priceChange.isPositive ? <TrendingUp className="w-3 h-3 inline mr-1" /> : <TrendingDown className="w-3 h-3 inline mr-1" />}
+                {priceChange.value}
+              </span>
+            </div>
+            <div className="px-3 py-1 bg-[#00f5ff]/10 text-[#00f5ff] text-xs font-semibold rounded-full flex items-center gap-x-1">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              LIVE
             </div>
           </div>
 
-          {/* Timeframe Segmented Control - Apple Style */}
-          <div className="flex bg-[var(--fill-primary)] rounded-[var(--radius-md)] p-0.5">
-            {timeframes.slice(0, 5).map(tf => (
+          {/* Timeframes - Hidden on mobile */}
+          <div className="hidden md:flex gap-1 bg-[#252525] p-1 rounded-2xl">
+            {timeframes.map(tf => (
               <button
                 key={tf}
                 onClick={() => setTimeframe(tf)}
-                className={`px-3 py-1.5 rounded-[var(--radius-sm)] text-xs font-medium transition-all ${
+                className={`px-4 py-1.5 text-sm font-medium rounded-xl transition-all ${
                   timeframe === tf 
-                    ? 'bg-[var(--bg-tertiary)] text-[var(--text-primary)] shadow-sm' 
-                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+                    ? 'bg-[#00f5ff] text-black' 
+                    : 'text-gray-400 hover:bg-[#00f5ff]/20 hover:text-[#00f5ff]'
                 }`}
               >
                 {tf}
@@ -109,58 +102,42 @@ export default function Toolbar({
           </div>
         </div>
 
-        {/* Right - Price & Status */}
+        {/* Right - MT5 & Menu */}
         <div className="flex items-center gap-3">
-          {/* Price Display */}
-          <div className="flex flex-col items-end mr-2">
-            <span className="text-lg sm:text-xl font-semibold font-mono text-[var(--text-primary)] tracking-tight">
-              {getLastPrice()}
-            </span>
-            <div className={`flex items-center gap-1 text-xs font-medium ${priceChange.isPositive ? 'text-[var(--bullish)]' : 'text-[var(--bearish)]'}`}>
-              {priceChange.isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-              <span>{priceChange.value}</span>
-            </div>
-          </div>
-
-          {/* MT5 Status - Apple Style */}
           <button 
             onClick={checkMT5}
-            className={`hidden sm:flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] transition-all ${
-              mt5Online 
-                ? 'bg-[var(--bullish)]/10 text-[var(--bullish)]' 
-                : 'bg-[var(--bearish)]/10 text-[var(--bearish)]'
-            }`}
+            className="hidden sm:flex px-5 py-2 bg-[#00f5ff] hover:bg-[#00f5ff]/90 text-black font-semibold rounded-2xl items-center gap-2 transition-all shadow-[0_0_10px_rgba(0,245,255,0.3)]"
           >
             <Activity className="w-4 h-4" />
-            <span className="text-xs font-semibold">{mt5Online ? 'Live' : 'Off'}</span>
+            CONNECT MT5
           </button>
 
           {/* Mobile Menu Button */}
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-[var(--radius-md)] bg-[var(--fill-primary)] text-[var(--text-secondary)]"
+            className="md:hidden p-2 rounded-xl bg-[#252525] text-gray-400"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
-      </div>
+      </nav>
 
-      {/* Mobile Menu Sheet - Apple Style */}
+      {/* Mobile Menu Sheet */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-x-0 top-[57px] bottom-0 z-50 bg-black/50 backdrop-blur-sm animate-spring" onClick={() => setMobileMenuOpen(false)}>
-          <div className="absolute top-0 left-0 right-0 bg-[var(--bg-secondary)] rounded-b-[var(--radius-xl)] border-b border-[var(--separator)] p-4 shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="md:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
+          <div className="absolute top-[60px] left-4 right-4 bg-[#1a1a1a] rounded-3xl border border-[#00f5ff]/20 p-4 shadow-2xl" onClick={e => e.stopPropagation()}>
             {/* Symbol Selector */}
             <div className="mb-4">
-              <label className="text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wide mb-2 block">Symbol</label>
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2 block">Symbol</label>
               <div className="grid grid-cols-2 gap-2">
                 {symbols.map(sym => (
                   <button
                     key={sym.value}
                     onClick={() => { setSymbol(sym.value); setMobileMenuOpen(false); }}
-                    className={`p-3 rounded-[var(--radius-md)] text-sm font-medium transition-all ${
+                    className={`p-3 rounded-xl text-sm font-medium transition-all ${
                       symbol === sym.value
-                        ? 'bg-[var(--system-blue)] text-white'
-                        : 'bg-[var(--fill-primary)] text-[var(--text-secondary)]'
+                        ? 'bg-[#00f5ff] text-black'
+                        : 'bg-[#252525] text-gray-400'
                     }`}
                   >
                     {sym.label}
@@ -171,16 +148,16 @@ export default function Toolbar({
 
             {/* Timeframe Selector */}
             <div className="mb-4">
-              <label className="text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wide mb-2 block">Timeframe</label>
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2 block">Timeframe</label>
               <div className="flex flex-wrap gap-2">
                 {timeframes.map(tf => (
                   <button
                     key={tf}
                     onClick={() => { setTimeframe(tf); setMobileMenuOpen(false); }}
-                    className={`px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium transition-all ${
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                       timeframe === tf
-                        ? 'bg-[var(--system-blue)] text-white'
-                        : 'bg-[var(--fill-primary)] text-[var(--text-secondary)]'
+                        ? 'bg-[#00f5ff] text-black'
+                        : 'bg-[#252525] text-gray-400'
                     }`}
                   >
                     {tf}
@@ -192,10 +169,10 @@ export default function Toolbar({
             {/* MT5 Status */}
             <button 
               onClick={() => { checkMT5(); setMobileMenuOpen(false); }}
-              className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-[var(--radius-md)] font-medium ${
+              className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium ${
                 mt5Online 
-                  ? 'bg-[var(--bullish)]/15 text-[var(--bullish)]' 
-                  : 'bg-[var(--bearish)]/15 text-[var(--bearish)]'
+                  ? 'bg-green-500/20 text-green-400' 
+                  : 'bg-red-500/20 text-red-400'
               }`}
             >
               <Activity className="w-5 h-5" />

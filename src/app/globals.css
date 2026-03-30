@@ -3,55 +3,50 @@
 @tailwind utilities;
 
 :root {
-  /* Apple-inspired Premium Color Palette - Dark Mode */
-  --bg-primary: #000000;
-  --bg-secondary: #1c1c1e;
-  --bg-tertiary: #2c2c2e;
-  --bg-card: rgba(44, 44, 46, 0.72);
-  --bg-glass: rgba(28, 28, 30, 0.82);
-  --bg-hover: rgba(60, 60, 67, 0.6);
+  /* Neural Trading Terminal - Dark AI Theme */
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #252525;
+  --bg-card: #1a1a1a;
+  --bg-hover: #2a2a2a;
   
-  /* Apple System Colors */
-  --system-blue: #0a84ff;
-  --system-green: #30d158;
-  --system-red: #ff453a;
-  --system-orange: #ff9f0a;
-  --system-yellow: #ffd60a;
-  --system-purple: #bf5af2;
-  --system-pink: #ff375f;
-  --system-teal: #64d2ff;
-  --system-indigo: #5e5ce6;
+  /* Neural Accent Colors */
+  --neural-cyan: #00f5ff;
+  --neural-cyan-dim: rgba(0, 245, 255, 0.1);
+  --neural-cyan-glow: rgba(0, 245, 255, 0.3);
+  --neural-purple: #bf5af2;
+  --neural-amber: #ff9f0a;
   
-  /* Trading Specific */
-  --bullish: #30d158;
-  --bearish: #ff453a;
-  --neutral: #8e8e93;
+  /* Trading Colors */
+  --bullish: #22c55e;
+  --bearish: #ef4444;
+  --neutral: #6b7280;
   
-  /* Text Colors - Apple Style */
+  /* Text Colors */
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --text-tertiary: rgba(255, 255, 255, 0.55);
-  --text-quaternary: rgba(255, 255, 255, 0.3);
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --text-dim: #4b5563;
   
-  /* Separator/Border */
-  --separator: rgba(84, 84, 88, 0.65);
-  --separator-opaque: #38383a;
+  /* Borders */
+  --border-primary: #00f5ff;
+  --border-dim: rgba(0, 245, 255, 0.1);
+  --border-hover: rgba(0, 245, 255, 0.2);
   
-  /* Apple Fill Colors */
-  --fill-primary: rgba(120, 120, 128, 0.2);
-  --fill-secondary: rgba(120, 120, 128, 0.16);
-  --fill-tertiary: rgba(118, 118, 128, 0.12);
+  /* Glow Effects */
+  --glow-cyan: 0 0 20px rgba(0, 245, 255, 0.5);
+  --glow-cyan-sm: 0 0 10px rgba(0, 245, 255, 0.3);
   
-  /* Shadows - Apple Style */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.5);
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
   
-  /* Border Radius - Apple Style */
-  --radius-sm: 6px;
-  --radius-md: 10px;
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-xl: 20px;
+  --radius-xl: 24px;
   --radius-full: 9999px;
 }
 
@@ -59,16 +54,13 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 html {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-  font-size: 16px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
   height: 100%;
-  overflow: hidden;
+  background: var(--bg-primary);
 }
 
 body {
@@ -76,148 +68,141 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow: hidden;
-  touch-action: pan-x pan-y;
 }
 
-/* Apple-style Scrollbar */
+/* Neural Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 100px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
+  background: var(--border-dim);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--neural-cyan-dim);
 }
 
-/* Apple-style Buttons */
-.btn-primary {
-  background: var(--system-blue);
-  color: white;
+/* Neural Typography */
+.neural-glow {
+  text-shadow: 0 0 20px var(--neural-cyan);
+}
+
+.neural-glow-sm {
+  text-shadow: 0 0 10px var(--neural-cyan);
+}
+
+/* Neural Buttons */
+.btn-neural {
+  background: var(--neural-cyan);
+  color: #000;
   border: none;
-  border-radius: var(--radius-md);
-  padding: 12px 20px;
+  border-radius: var(--radius-lg);
+  padding: 10px 20px;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  -webkit-appearance: none;
-  touch-action: manipulation;
+  transition: all 0.2s ease;
+  box-shadow: var(--glow-cyan-sm);
 }
 
-.btn-primary:hover {
-  transform: scale(1.02);
+.btn-neural:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--glow-cyan);
   filter: brightness(1.1);
 }
 
-.btn-primary:active {
-  transform: scale(0.98);
-  filter: brightness(0.9);
-}
-
 .btn-secondary {
-  background: var(--fill-primary);
-  color: var(--system-blue);
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 12px 20px;
-  font-weight: 600;
-  font-size: 15px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  padding: 10px 20px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  -webkit-appearance: none;
-  touch-action: manipulation;
+  transition: all 0.2s ease;
 }
 
-/* Apple-style Glass Cards */
-.glass-card {
-  background: var(--bg-card);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-radius: var(--radius-lg);
-  border: 0.5px solid var(--separator);
+.btn-secondary:hover {
+  background: var(--bg-hover);
+  border-color: var(--neural-cyan);
+}
+
+/* Neural Cards */
+.neural-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
 }
 
-/* Apple-style Input Fields */
-.input-apple {
-  background: var(--fill-primary);
-  border: none;
-  border-radius: var(--radius-md);
+/* Neural Inputs */
+.input-neural {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
   color: var(--text-primary);
   padding: 12px 16px;
-  font-size: 16px;
+  font-size: 14px;
   transition: all 0.2s ease;
-  -webkit-appearance: none;
   outline: none;
   width: 100%;
 }
 
-.input-apple:focus {
-  background: var(--bg-tertiary);
-  box-shadow: 0 0 0 2px var(--system-blue);
+.input-neural:focus {
+  border-color: var(--neural-cyan);
+  box-shadow: 0 0 0 2px var(--neural-cyan-dim);
 }
 
-/* Apple-style Segmented Control */
-.segmented-control {
-  display: flex;
-  background: var(--fill-primary);
+/* Timeframe Buttons */
+.timeframe-btn {
+  padding: 6px 12px;
   border-radius: var(--radius-md);
-  padding: 2px;
-  gap: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.segmented-control-item {
-  flex: 1;
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
+.timeframe-btn:hover {
+  background: var(--neural-cyan-dim);
+  color: var(--neural-cyan);
+}
+
+.timeframe-btn.active {
+  background: var(--neural-cyan);
+  color: #000;
+}
+
+/* Command Chips */
+.command-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-full);
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
-  text-align: center;
-  border: none;
-  background: transparent;
-  -webkit-appearance: none;
 }
 
-.segmented-control-item.active {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-sm);
-}
-
-/* Apple-style Badges */
-.badge-buy {
-  background: rgba(48, 209, 88, 0.15);
-  color: var(--bullish);
-  border: 0.5px solid rgba(48, 209, 88, 0.3);
-  padding: 4px 10px;
-  border-radius: 100px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.badge-sell {
-  background: rgba(255, 69, 58, 0.15);
-  color: var(--bearish);
-  border: 0.5px solid rgba(255, 69, 58, 0.3);
-  padding: 4px 10px;
-  border-radius: 100px;
-  font-size: 12px;
-  font-weight: 700;
+.command-chip:hover {
+  background: var(--neural-cyan);
+  color: #000;
+  border-color: var(--neural-cyan);
 }
 
 /* Price Display */
@@ -230,82 +215,12 @@ body {
 .price-up { color: var(--bullish); }
 .price-down { color: var(--bearish); }
 
-/* Panel Headers */
-.panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 0.5px solid var(--separator);
-  font-weight: 700;
-  font-size: 17px;
-  letter-spacing: -0.4px;
+/* Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
-/* Tab Bar */
-.tab-bar {
-  display: flex;
-  background: var(--fill-primary);
-  border-radius: var(--radius-lg);
-  padding: 2px;
-  margin: 8px;
+.animate-pulse {
+  animation: pulse 2s infinite;
 }
-
-.tab-bar-item {
-  flex: 1;
-  padding: 10px;
-  border-radius: var(--radius-md);
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-tertiary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  border: none;
-  background: transparent;
-}
-
-.tab-bar-item.active {
-  background: var(--bg-tertiary);
-  color: var(--system-blue);
-  box-shadow: var(--shadow-sm);
-}
-
-/* Touch Optimizations */
-@media (hover: none) and (pointer: coarse) {
-  .btn-primary, .btn-secondary, .segmented-control-item, .tab-bar-item {
-    min-height: 44px;
-  }
-  .input-apple {
-    font-size: 16px;
-  }
-}
-
-/* Mobile Breakpoint */
-@media (max-width: 768px) {
-  html { font-size: 15px; }
-  .panel-header {
-    padding: 12px 16px;
-    font-size: 15px;
-  }
-  .glass-card {
-    border-radius: var(--radius-md);
-  }
-}
-
-/* Safe Area for iPhone X+ */
-@supports (padding-top: env(safe-area-inset-top)) {
-  .safe-area-top { padding-top: env(safe-area-inset-top); }
-  .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
-}
-
-@keyframes spring-in {
-  0% { opacity: 0; transform: scale(0.95) translateY(10px); }
-  70% { opacity: 1; transform: scale(1.02) translateY(-2px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.animate-spring { animation: spring-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
