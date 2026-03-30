@@ -8,6 +8,7 @@ interface TradingChartProps {
   candles: any[];
   signal: any;
   chartContainerRef: React.RefObject<HTMLDivElement>;
+  isMobile?: boolean;
 }
 
 export default function TradingChart({ 
@@ -15,7 +16,8 @@ export default function TradingChart({
   timeframe, 
   candles, 
   signal, 
-  chartContainerRef 
+  chartContainerRef, 
+  isMobile 
 }: TradingChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const resizeObserverRef = useRef<ResizeObserver>();

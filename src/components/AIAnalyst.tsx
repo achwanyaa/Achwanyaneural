@@ -7,9 +7,11 @@ interface AIAnalystProps {
   messages: any[];
   loading: boolean;
   onSendMessage: (message: string) => void;
+  onClose?: () => void;
+  isMobile?: boolean;
 }
 
-export default function AIAnalyst({ messages, loading, onSendMessage }: AIAnalystProps) {
+export default function AIAnalyst({ messages, loading, onSendMessage, onClose, isMobile }: AIAnalystProps) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);

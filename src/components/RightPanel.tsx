@@ -14,6 +14,8 @@ interface RightPanelProps {
   placeTrade: () => void;
   setSignal: (signal: any) => void;
   symbol: string;
+  onClose?: () => void;
+  isMobile?: boolean;
 }
 
 export default function RightPanel({ 
@@ -27,7 +29,9 @@ export default function RightPanel({
   checkMT5, 
   placeTrade, 
   setSignal, 
-  symbol 
+  symbol,
+  onClose,
+  isMobile
 }: RightPanelProps) {
   const tabs = [
     { id: 'signal', label: 'Signal', icon: Target },
