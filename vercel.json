@@ -5,6 +5,6 @@
   "framework": "nextjs",
   "regions": ["iad1"],
   "env": {
-    "NEXT_PUBLIC_ANTHROPIC_API_KEY": "@anthropic-api-key"
+    "NEXT_PUBLIC_ANTHROPIC_API_KEY": "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"
   }
 }
