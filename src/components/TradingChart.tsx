@@ -64,11 +64,11 @@ export default function TradingChart({
     for (let i = 0; i <= 5; i++) {
       const p = minP + (i / 5) * range;
       const y = toY(p);
-      html += `<line x1="${PL}" y1="${y}" x2="${W - PR}" y2="${y}" stroke="#182840" stroke-width="1"/>`;
-      html += `<text x="${PL - 3}" y="${y + 3.5}" fill="#3a5568" font-size="9.5" text-anchor="end" font-family="Consolas,monospace">${p.toFixed(d)}</text>`;
+      html += `<line x1="${PL}" y1="${y}" x2="${W - PR}" y2="${y}" stroke="#1f2937" stroke-width="1"/>`;
+      html += `<text x="${PL - 3}" y="${y + 3.5}" fill="#6b7280" font-size="9.5" text-anchor="end" font-family="JetBrains Mono, monospace">${p.toFixed(d)}</text>`;
     }
     
-    html += `<line x1="${PL}" y1="${PT + ph + 8}" x2="${W - PR}" y2="${PT + ph + 8}" stroke="#182840" stroke-width="1"/>`;
+    html += `<line x1="${PL}" y1="${PT + ph + 8}" x2="${W - PR}" y2="${PT + ph + 8}" stroke="#1f2937" stroke-width="1"/>`;
 
     // Candles
     visible.forEach((candle, i) => {
@@ -78,47 +78,47 @@ export default function TradingChart({
       const cY = toY(candle.c);
       const by = Math.min(oY, cY);
       const bh = Math.max(1, Math.abs(cY - oY));
-      const color = candle.b ? '#00e07a' : '#ff3356';
+      const color = candle.b ? '#10b981' : '#ef4444';
       const vh2 = Math.max(1, (candle.v / maxV) * VH);
       
-      html += `<line x1="${cx}" y1="${toY(candle.h)}" x2="${cx}" y2="${toY(candle.l)}" stroke="${color}" stroke-width="1" opacity="0.7"/>`;
-      html += `<rect x="${x + 1}" y="${by}" width="${Math.max(2, bw - 2)}" height="${bh}" fill="${color}" opacity="0.85" rx="0.5"/>`;
-      html += `<rect x="${x + 1}" y="${toVY(candle.v)}" width="${Math.max(2, bw - 2)}" height="${vh2}" fill="${color}" opacity="0.2"/>`;
+      html += `<line x1="${cx}" y1="${toY(candle.h)}" x2="${cx}" y2="${toY(candle.l)}" stroke="${color}" stroke-width="1" opacity="0.8"/>`;
+      html += `<rect x="${x + 1}" y="${by}" width="${Math.max(2, bw - 2)}" height="${bh}" fill="${color}" rx="1"/>`;
+      html += `<rect x="${x + 1}" y="${toVY(candle.v)}" width="${Math.max(2, bw - 2)}" height="${vh2}" fill="${color}" opacity="0.15"/>`;
     });
 
     // Signal lines
     if (signal && last) {
       const isBuy = signal.dir === 'buy';
-      const color = isBuy ? '#00e07a' : '#ff3356';
+      const color = isBuy ? '#10b981' : '#ef4444';
       const lastIndex = visible.length - 1;
       const lastCx = toX(lastIndex);
       
       if (signal.tp) {
         const y = toY(signal.tp);
-        html += `<line x1="${PL}" y1="${y}" x2="${W - PR}" y2="${y}" stroke="#00e07a" stroke-width="1" stroke-dasharray="5,3" opacity="0.55"/>`;
-        html += `<text x="${W - PR - 4}" y="${y - 3}" fill="#00e07a" font-size="9" text-anchor="end" font-family="Consolas,monospace">TP ${signal.tp.toFixed(d)}</text>`;
+        html += `<line x1="${PL}" y1="${y}" x2="${W - PR}" y2="${y}" stroke="#10b981" stroke-width="1" stroke-dasharray="5,3" opacity="0.6"/>`;
+        html += `<text x="${W - PR - 4}" y="${y - 3}" fill="#10b981" font-size="9" text-anchor="end" font-family="JetBrains Mono, monospace">TP ${signal.tp.toFixed(d)}</text>`;
       }
       
       if (signal.sl) {
         const y = toY(signal.sl);
-        html += `<line x1="${PL}" y1="${y}" x2="${W - PR}" y2="${y}" stroke="#ff3356" stroke-width="1" stroke-dasharray="5,3" opacity="0.55"/>`;
-        html += `<text x="${W - PR - 4}" y="${y + 11}" fill="#ff3356" font-size="9" text-anchor="end" font-family="Consolas,monospace">SL ${signal.sl.toFixed(d)}</text>`;
+        html += `<line x1="${PL}" y1="${y}" x2="${W - PR}" y2="${y}" stroke="#ef4444" stroke-width="1" stroke-dasharray="5,3" opacity="0.6"/>`;
+        html += `<text x="${W - PR - 4}" y="${y + 11}" fill="#ef4444" font-size="9" text-anchor="end" font-family="JetBrains Mono, monospace">SL ${signal.sl.toFixed(d)}</text>`;
       }
       
       if (signal.entry) {
         const y = toY(signal.entry);
-        html += `<line x1="${PL}" y1="${y}" x2="${W - PR}" y2="${y}" stroke="${color}" stroke-width="1.5" opacity="0.8"/>`;
+        html += `<line x1="${PL}" y1="${y}" x2="${W - PR}" y2="${y}" stroke="${color}" stroke-width="1.5" opacity="0.9"/>`;
       }
       
       const arrowY = isBuy ? toY(last.l) + 24 : toY(last.h) - 24;
       const arrowTip = isBuy ? arrowY - 13 : arrowY + 13;
-      html += `<polygon points="${lastCx},${arrowTip} ${lastCx - 7},${arrowY} ${lastCx + 7},${arrowY}" fill="${color}" opacity="0.95"/>`;
+      html += `<polygon points="${lastCx},${arrowTip} ${lastCx - 7},${arrowY} ${lastCx + 7},${arrowY}" fill="${color}"/>`;
     }
 
     // Current price line
     if (last) {
       const ly = toY(last.c);
-      html += `<line x1="${PL}" y1="${ly}" x2="${W - PR}" y2="${ly}" stroke="white" stroke-width="0.5" stroke-dasharray="2,6" opacity="0.2"/>`;
+      html += `<line x1="${PL}" y1="${ly}" x2="${W - PR}" y2="${ly}" stroke="#f9fafb" stroke-width="0.5" stroke-dasharray="2,6" opacity="0.15"/>`;
     }
 
     svg.innerHTML = html;
@@ -147,10 +147,18 @@ export default function TradingChart({
   }, [candles, signal, symbol]);
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-background">
-      <div className="px-2.5 py-1.5 border-b border-border flex gap-2.5 items-center font-mono text-xs text-muted flex-shrink-0 overflow-hidden">
-        <span className="text-text font-semibold">{symbol}</span>
-        <span>{timeframe}</span>
+    <div className="flex-1 flex flex-col min-w-0 bg-[var(--bg-primary)]">
+      <div className="px-4 py-3 border-b border-[var(--border-primary)] flex items-center justify-between flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <span className="text-[var(--text-primary)] font-bold text-sm">{symbol}</span>
+          <span className="text-[var(--text-muted)] text-xs bg-[var(--bg-tertiary)] px-2 py-1 rounded">{timeframe}</span>
+        </div>
+        {signal && (
+          <div className={`flex items-center gap-2 text-xs font-semibold ${signal.dir === 'buy' ? 'text-[var(--bullish)]' : 'text-[var(--bearish)]'}`}>
+            <span className="uppercase tracking-wide">{signal.dir}</span>
+            <span>@{signal.entry?.toFixed(2)}</span>
+          </div>
+        )}
       </div>
       
       <div 

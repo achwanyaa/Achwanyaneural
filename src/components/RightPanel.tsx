@@ -1,5 +1,7 @@
 'use client';
 
+import { Target, BarChart3, Cpu, Play, Trash2, CheckCircle2, XCircle, Copy, ExternalLink } from 'lucide-react';
+
 interface RightPanelProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -27,8 +29,11 @@ export default function RightPanel({
   setSignal, 
   symbol 
 }: RightPanelProps) {
-  const tabs = ['signal', 'pos', 'bridge'];
-  const tabLabels = { signal: 'Signal', pos: 'Trades', bridge: 'MT5' };
+  const tabs = [
+    { id: 'signal', label: 'Signal', icon: Target },
+    { id: 'pos', label: 'Trades', icon: BarChart3 },
+    { id: 'bridge', label: 'MT5', icon: Cpu }
+  ];
 
   const BRIDGE_CODE = `# pip install fastapi uvicorn MetaTrader5
 from fastapi import FastAPI
@@ -86,72 +91,92 @@ if __name__ == "__main__":
   const renderSignalTab = () => {
     if (!signal) {
       return (
-        <div className="text-center py-10 text-muted leading-loose text-xs">
-          <div className="text-2xl opacity-15 mb-2">◎</div>
-          No signal yet<br/>
-          <span className="text-xs text-muted">Ask the analyst to<br/>analyze the chart</span>
+        <div className="text-center py-12">
+          <Target className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-3 opacity-40" />
+          <p className="text-sm text-[var(--text-muted)] font-medium">No Signal Yet</p>
+          <p className="text-xs text-[var(--text-muted)] mt-2">Ask the AI analyst to<br/>analyze the chart</p>
         </div>
       );
     }
 
-    const color = signal.dir === 'buy' ? 'text-green' : 'text-red';
-    const bgColor = signal.dir === 'buy' ? 'bg-green/10 border-green/30' : 'bg-red/10 border-red/30';
+    const isBuy = signal.dir === 'buy';
+    const colorClass = isBuy ? 'text-[var(--bullish)]' : 'text-[var(--bearish)]';
+    const bgClass = isBuy ? 'bg-[var(--bullish)]/10 border-[var(--bullish)]/30' : 'bg-[var(--bearish)]/10 border-[var(--bearish)]/30';
+    const btnClass = isBuy ? 'bg-[var(--bullish)] hover:bg-[var(--bullish)]/90' : 'bg-[var(--bearish)] hover:bg-[var(--bearish)]/90';
 
     return (
-      <div className="flex flex-col gap-1.5">
-        <div className={`px-2.5 py-2.5 rounded text-center ${bgColor} border`}>
-          <div className={`text-base font-bold ${color} tracking-wider`}>
-            {signal.dir.toUpperCase()}
+      <div className="flex flex-col gap-3">
+        {/* Direction Badge */}
+        <div className={`p-4 rounded-lg border ${bgClass} text-center`}>
+          <div className={`text-2xl font-bold ${colorClass} uppercase tracking-wider`}>
+            {signal.dir}
           </div>
-          <div className="text-xs text-muted mt-0.5 font-mono">
-            {signal.conf}% confidence
+          <div className="text-xs text-[var(--text-muted)] mt-1 font-mono">
+            {signal.conf}% Confidence
           </div>
         </div>
         
-        {[
-          ['ENTRY', signal.entry, color],
-          ['STOP LOSS', signal.sl, 'text-red'],
-          ['TAKE PROFIT', signal.tp, 'text-green']
-        ].map(([label, value, valueColor]) => (
-          <div key={label} className="flex justify-between items-center px-2 py-1.5 bg-surface rounded border border-border">
-            <span className="text-xs text-muted font-mono">{label}</span>
-            <span className={`font-mono font-bold ${valueColor} text-xs`}>
-              {value?.toFixed(d) ?? '-'}
-            </span>
-          </div>
-        ))}
+        {/* Levels */}
+        <div className="space-y-2">
+          {[
+            { label: 'ENTRY', value: signal.entry, color: colorClass },
+            { label: 'STOP LOSS', value: signal.sl, color: 'text-[var(--bearish)]' },
+            { label: 'TAKE PROFIT', value: signal.tp, color: 'text-[var(--bullish)]' }
+          ].map(({ label, value, color }) => (
+            <div key={label} className="flex justify-between items-center px-3 py-2.5 bg-[var(--bg-tertiary)] rounded-lg border border-[var(--border-primary)]">
+              <span className="text-xs text-[var(--text-muted)] font-medium">{label}</span>
+              <span className={`font-mono font-bold text-sm ${color}`}>
+                {value?.toFixed(d) ?? '-'}
+              </span>
+            </div>
+          ))}
+        </div>
         
         {signal.rr && (
-          <div className="flex justify-between px-1.5 py-1 bg-surface rounded border border-border">
-            <span className="text-xs text-muted font-mono">R:R</span>
-            <span className="font-mono text-gold font-bold text-xs">{signal.rr}</span>
+          <div className="flex justify-between px-3 py-2 bg-[var(--bg-tertiary)] rounded-lg border border-[var(--border-primary)]">
+            <span className="text-xs text-[var(--text-muted)] font-medium">RISK:REWARD</span>
+            <span className="font-mono font-bold text-sm text-[var(--accent-gold)]">{signal.rr}</span>
           </div>
         )}
         
         {signal.reason && (
-          <div className="px-2 py-1.5 bg-surface rounded border border-border text-xs text-dim leading-relaxed">
+          <div className="p-3 bg-[var(--bg-tertiary)] rounded-lg border border-[var(--border-primary)] text-xs text-[var(--text-secondary)] leading-relaxed">
             {signal.reason}
           </div>
         )}
         
-        <button
-          onClick={placeTrade}
-          disabled={!mt5Online}
-          className={`px-2 py-2 rounded font-bold text-xs tracking-wide transition-colors ${
-            mt5Online
-              ? `${signal.dir === 'buy' ? 'bg-green text-background' : 'bg-red text-background'} cursor-pointer`
-              : 'bg-surface text-muted cursor-not-allowed'
-          }`}
-        >
-          {mt5Online ? `▶ Place ${signal.dir.toUpperCase()} Trade` : 'Connect MT5 First'}
-        </button>
-        
-        <button
-          onClick={() => setSignal(null)}
-          className="px-1 py-1 rounded text-xs text-muted bg-transparent border border-border cursor-pointer"
-        >
-          Dismiss signal
-        </button>
+        {/* Action Buttons */}
+        <div className="space-y-2 pt-2">
+          <button
+            onClick={placeTrade}
+            disabled={!mt5Online}
+            className={`w-full px-4 py-3 rounded-lg font-bold text-sm tracking-wide text-white transition-all flex items-center justify-center gap-2 ${
+              mt5Online
+                ? `${btnClass} shadow-lg shadow-current/20`
+                : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)] cursor-not-allowed'
+            }`}
+          >
+            {mt5Online ? (
+              <>
+                <Play className="w-4 h-4" />
+                EXECUTE {signal.dir.toUpperCase()}
+              </>
+            ) : (
+              <>
+                <XCircle className="w-4 h-4" />
+                CONNECT MT5 FIRST
+              </>
+            )}
+          </button>
+          
+          <button
+            onClick={() => setSignal(null)}
+            className="w-full px-4 py-2 rounded-lg text-xs text-[var(--text-muted)] bg-transparent border border-[var(--border-primary)] hover:border-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors flex items-center justify-center gap-2"
+          >
+            <Trash2 className="w-3 h-3" />
+            DISMISS SIGNAL
+          </button>
+        </div>
       </div>
     );
   };
@@ -159,75 +184,98 @@ if __name__ == "__main__":
   const renderPositionsTab = () => {
     if (!positions.length) {
       return (
-        <div className="text-center py-10 text-muted text-xs leading-loose">
-          <div className="text-2xl opacity-15 mb-2">◫</div>
-          No open positions
+        <div className="text-center py-12">
+          <BarChart3 className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-3 opacity-40" />
+          <p className="text-sm text-[var(--text-muted)] font-medium">No Open Positions</p>
         </div>
       );
     }
 
-    return positions.map((position, index) => {
-      const color = position.dir === 'buy' ? 'text-green' : 'text-red';
-      return (
-        <div key={index} className="px-2 py-2 bg-surface rounded border border-border mb-1.5 text-xs">
-          <div className="flex justify-between mb-1">
-            <span className={`font-bold ${color}`}>
-              {position.dir.toUpperCase()} {position.symbol}
-            </span>
-            <span className="font-mono text-xs text-muted">#{position.ticket}</span>
-          </div>
-          <div className="flex gap-2 font-mono text-xs text-dim">
-            <span>@ {position.entry?.toFixed(d)}</span>
-            <span className="text-red">SL {position.sl?.toFixed(d)}</span>
-          </div>
-          <div className="text-xs text-muted mt-1">
-            {new Date(position.time).toLocaleTimeString()}
-          </div>
-        </div>
-      );
-    });
+    return (
+      <div className="space-y-2">
+        {positions.map((position, index) => {
+          const isBuy = position.dir === 'buy';
+          return (
+            <div key={index} className="p-3 bg-[var(--bg-tertiary)] rounded-lg border border-[var(--border-primary)]">
+              <div className="flex justify-between items-center mb-2">
+                <span className={`font-bold text-sm ${isBuy ? 'text-[var(--bullish)]' : 'text-[var(--bearish)]'}`}>
+                  {position.dir.toUpperCase()} {position.symbol}
+                </span>
+                <span className="font-mono text-xs text-[var(--text-muted)] bg-[var(--bg-secondary)] px-2 py-0.5 rounded">
+                  #{position.ticket}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs font-mono text-[var(--text-muted)]">
+                <span>Entry: {position.entry?.toFixed(d)}</span>
+                <span className="text-[var(--bearish)]">SL: {position.sl?.toFixed(d)}</span>
+              </div>
+              <div className="text-[10px] text-[var(--text-muted)] mt-2">
+                {new Date(position.time).toLocaleString()}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   const renderBridgeTab = () => (
-    <div className="flex flex-col gap-2 text-xs">
-      <div className="text-dim text-xs leading-relaxed">
-        Run the Python bridge locally to enable live MT5 execution.
+    <div className="flex flex-col gap-4">
+      <div className="p-3 bg-[var(--bg-tertiary)] rounded-lg border border-[var(--border-primary)]">
+        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+          Connect your MetaTrader 5 terminal to enable live trade execution.
+        </p>
       </div>
       
+      {/* URL Input */}
       <div>
-        <div className="text-xs text-muted font-mono mb-1">BRIDGE URL</div>
-        <div className="flex gap-1">
+        <label className="text-xs text-[var(--text-muted)] font-medium mb-1.5 block">BRIDGE URL</label>
+        <div className="flex gap-2">
           <input
             value={mt5Url}
             onChange={(e) => setMt5Url(e.target.value)}
-            className="flex-1 font-mono text-xs px-1.5 py-1 bg-surface border border-border rounded outline-none"
+            placeholder="http://localhost:8000"
+            className="flex-1 font-mono text-xs px-3 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] rounded-lg outline-none focus:border-[var(--accent-cyan)] transition-colors text-[var(--text-primary)]"
           />
           <button
             onClick={checkMT5}
-            className="px-2 py-1 rounded bg-blue/20 border border-blue/40 text-blue text-xs cursor-pointer whitespace-nowrap"
+            className="px-3 py-2 rounded-lg bg-[var(--accent-blue)]/20 border border-[var(--accent-blue)]/40 text-[var(--accent-blue)] text-xs font-medium hover:bg-[var(--accent-blue)]/30 transition-colors flex items-center gap-1"
           >
-            Test
+            <CheckCircle2 className="w-3 h-3" />
+            TEST
           </button>
         </div>
       </div>
       
+      {/* Code Block */}
       <div>
-        <div className="text-xs text-muted font-mono mb-1">mt5_bridge.py</div>
-        <div className="bg-background border border-border rounded p-2 text-xs font-mono text-dim overflow-x-auto max-h-48 overflow-y-auto leading-relaxed select-text">
-          {BRIDGE_CODE}
+        <label className="text-xs text-[var(--text-muted)] font-medium mb-1.5 block flex items-center gap-1">
+          <Cpu className="w-3 h-3" />
+          mt5_bridge.py
+        </label>
+        <div className="bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-lg p-3 text-[10px] font-mono text-[var(--text-muted)] overflow-x-auto max-h-40 overflow-y-auto leading-relaxed">
+          <pre>{BRIDGE_CODE}</pre>
         </div>
         <button
           onClick={() => navigator.clipboard.writeText(BRIDGE_CODE)}
-          className="mt-1 w-full px-1 py-1 rounded bg-surface border border-border text-dim text-xs cursor-pointer"
+          className="mt-2 w-full px-3 py-2 rounded-lg bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--text-secondary)] text-xs font-medium hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] transition-colors flex items-center justify-center gap-2"
         >
-          Copy Code
+          <Copy className="w-3 h-3" />
+          COPY CODE
         </button>
       </div>
       
-      <div className="px-2 py-2 bg-gold/10 border border-gold/30 rounded text-xs text-gold leading-relaxed">
-        1. pip install fastapi uvicorn MetaTrader5<br/>
-        2. python mt5_bridge.py<br/>
-        3. Click Test above
+      {/* Instructions */}
+      <div className="p-3 bg-[var(--accent-gold)]/10 border border-[var(--accent-gold)]/30 rounded-lg">
+        <p className="text-xs text-[var(--accent-gold)] leading-relaxed font-medium">
+          SETUP STEPS:
+        </p>
+        <ol className="text-[11px] text-[var(--accent-gold)]/80 mt-2 space-y-1 ml-3">
+          <li>1. pip install fastapi uvicorn MetaTrader5</li>
+          <li>2. Save code as mt5_bridge.py</li>
+          <li>3. python mt5_bridge.py</li>
+          <li>4. Click TEST to verify</li>
+        </ol>
       </div>
     </div>
   );
@@ -241,25 +289,41 @@ if __name__ == "__main__":
     }
   };
 
+  const ActiveIcon = tabs.find(t => t.id === activeTab)?.icon || Target;
+
   return (
-    <div className="w-48 flex-shrink-0 border-l border-border flex flex-col bg-panel">
-      <div className="flex border-b border-border flex-shrink-0">
-        {tabs.map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 px-1 py-2 font-mono text-xs uppercase tracking-wide transition-colors ${
-              activeTab === tab
-                ? 'text-cyan border-b-2 border-cyan'
-                : 'text-muted border-b-2 border-transparent'
-            }`}
-          >
-            {tabLabels[tab as keyof typeof tabLabels]}
-          </button>
-        ))}
+    <div className="w-56 flex-shrink-0 border-l border-[var(--border-primary)] flex flex-col bg-[var(--bg-secondary)]">
+      {/* Header with Icon */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border-primary)] bg-[var(--bg-card)]">
+        <ActiveIcon className="w-5 h-5 text-[var(--accent-cyan)]" />
+        <span className="font-bold text-sm text-[var(--text-primary)]">
+          {tabs.find(t => t.id === activeTab)?.label}
+        </span>
       </div>
       
-      <div className="flex-1 overflow-y-auto px-3 py-3">
+      {/* Tabs */}
+      <div className="flex border-b border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+        {tabs.map(tab => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 flex flex-col items-center py-2.5 text-xs font-medium transition-all ${
+                activeTab === tab.id
+                  ? 'text-[var(--accent-cyan)] border-b-2 border-[var(--accent-cyan)] bg-[var(--bg-card)]'
+                  : 'text-[var(--text-muted)] border-b-2 border-transparent hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+              }`}
+            >
+              <Icon className="w-4 h-4 mb-0.5" />
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+      
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-4">
         {renderContent()}
       </div>
     </div>
