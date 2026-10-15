@@ -1,155 +1,75 @@
-# Neural Trading Terminal
+# AchwanyaNeural
 
-A sophisticated AI-powered trading terminal with real-time chart analysis and MetaTrader 5 integration.
+A personal trading terminal: real price charts, a Claude-powered analyst that proposes setups, and
+one-click execution on MetaTrader 5 through a local bridge with built-in safety checks.
 
-## Features
+> Trading is risky. AI analysis can be wrong. Test on an MT5 **demo** account first, and check every level yourself.
 
-- 🤖 **AI-Powered Analysis**: Advanced trading analysis using Claude (Anthropic) API with ICT/SMC concepts
-- 📊 **Real-time Charts**: Interactive candlestick charts with volume indicators
-- 🎯 **Signal Generation**: Automated trading signals with entry, SL, TP levels
-- 🔗 **MT5 Integration**: Live trade execution via Python bridge
-- 💼 **Multi-Asset Support**: Forex, Gold, Crypto, and Indices
-- 🎨 **Professional UI**: Dark-themed interface optimized for traders
+## How it fits together
 
-## Live Demo
+```
+Browser (Next.js app)  ──/api/candles, /api/quotes──▶  Next.js server ──▶ free data feeds (Yahoo, Binance)
+        │              ──/api/analyze──────────────▶  Next.js server ──▶ Claude (API key stays on the server)
+        │
+        └── http://127.0.0.1:18765 (token) ──▶ bridge/mt5_bridge.py ──▶ MetaTrader 5 terminal (your PC)
+```
 
-🚀 **Deployed on Vercel**: [https://achwanyaneural.vercel.app](https://achwanyaneural.vercel.app)
+- **Market data** (`src/lib/market/`): free, keyless feeds, cached on the server.
+  Gold, NAS100 and US30 use futures (`GC=F`, `NQ=F`, `YM=F`), so they differ a little from broker CFD prices.
+  The UI labels them as possibly delayed.
+- **Analyst** (`src/app/api/analyze/route.ts`): sends recent bars plus derived levels to Claude. The answer
+  streams into the chat. A setup comes back through a structured `submit_signal` tool call, validated with zod.
+- **Execution** (`bridge/`): before any order is sent, the signal is shifted onto the broker's live price.
+  It is then re-checked (side, age, drift, risk:reward) and sized from your risk %. You confirm the exact lots
+  and money at risk. The bridge repeats the checks and refuses anything over its risk cap.
 
-## Quick Start
-
-### 1. Clone and Install
+## Run locally
 
 ```bash
-git clone https://github.com/achwanyaa/Achwanyaneural.git
-cd Achwanyaneural
 npm install
+cp .env.example .env.local   # set ANTHROPIC_API_KEY (APP_PASSWORD optional locally)
+npm run dev                  # http://localhost:3000
 ```
 
-### 2. Environment Setup
+Checks: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
+
+## MT5 bridge (Windows, MT5 running and logged in)
 
 ```bash
-cp .env.example .env.local
-# Add your Anthropic API key to .env.local
+cd bridge
+pip install -r requirements.txt
+python mt5_bridge.py         # first run creates bridge_config.json and prints a token
 ```
 
-### 3. Run Development Server
+1. Paste the token in the app's **MT5** tab and save.
+2. To use the deployed site, add its URL to `allowed_origins` in `bridge_config.json` and restart the bridge.
+3. If your broker uses suffixed symbols, map them in `symbol_map`, e.g. `{"XAUUSD": "XAUUSD.m", "NAS100": "USTEC"}`.
+4. Enable Algo Trading in MT5.
 
-```bash
-npm run dev
-```
+The bridge listens only on `127.0.0.1`. It answers only the listed origins and requires the token on every request.
+It only manages positions it opened (magic number `234000`).
+`max_risk_pct` (default 2) and `min_rr` (default 1) are enforced server-side.
+Use Chrome or Edge: Safari won't let an HTTPS site call a local bridge.
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Bridge tests (no MT5 needed): `cd bridge && pip install -r requirements-dev.txt && pytest`.
 
-## Live Trading Setup
+## Deploy (Vercel)
 
-### Prerequisites
-- MetaTrader 5 installed
-- Python 3.7+
+Set these in Project → Settings → Environment Variables. None are `NEXT_PUBLIC_`, so none reach the browser:
 
-### MT5 Bridge Setup
+| Variable | |
+|---|---|
+| `ANTHROPIC_API_KEY` | required |
+| `APP_PASSWORD` | required in production. The whole site is behind HTTP Basic Auth (any username). |
+| `ANTHROPIC_MODEL` | optional, defaults to `claude-opus-5-5` |
 
-1. **Install Python dependencies**:
-```bash
-pip install fastapi uvicorn MetaTrader5
-```
-
-2. **Run the MT5 bridge**:
-```bash
-python mt5_bridge.py
-```
-
-3. **Test connection** in the terminal's MT5 tab
-
-### Environment Variables
-
-```env
-NEXT_PUBLIC_ANTHROPIC_API_KEY=your_anthropic_api_key_here
-```
-
-## Project Structure
+## Layout
 
 ```
-├── src/
-│   ├── app/
-│   │   ├── page.tsx          # Main application page
-│   │   ├── layout.tsx        # Root layout
-│   │   └── globals.css       # Global styles
-│   └── components/
-│       ├── Toolbar.tsx       # Top navigation bar
-│       ├── TradingChart.tsx  # Chart visualization
-│       ├── AIAnalyst.tsx     # AI chat interface
-│       └── RightPanel.tsx    # Signals, positions, MT5 settings
-├── mt5_bridge.py             # Python MT5 integration
-├── package.json
-├── vercel.json              # Vercel deployment config
-└── README.md
+src/app/            page, layout, API routes (analyze, candles, quotes)
+src/proxy.ts        password gate (Next 16 "proxy", formerly middleware)
+src/components/     Terminal (layout/state), PriceChart, AnalystChat, SignalCard, TradeTicket, Positions, BridgePanel, …
+src/hooks/          useCandles/useQuotes, useAnalyst, useBridge
+src/lib/            symbols, types, signal validation & pre-trade checks, analysis helpers, bridge client, market feeds
+bridge/             mt5_bridge.py + tests
 ```
-
-## Deployment on Vercel
-
-1. **Connect GitHub Repository**:
-   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
-   - Click "New Project"
-   - Import your GitHub repository
-
-2. **Configure Environment Variables**:
-   - Add `NEXT_PUBLIC_ANTHROPIC_API_KEY` in Vercel settings
-   - Set your Anthropic API key
-
-3. **Deploy**:
-   - Vercel will automatically build and deploy
-   - Your app will be live at `https://your-project.vercel.app`
-
-## Usage
-
-### Basic Analysis
-1. Select your trading symbol (XAUUSD, EURUSD, etc.)
-2. Choose timeframe (5M, 15M, 30M, 1H, 2H)
-3. Ask the AI analyst: *"Analyze the current chart and give me a trade setup"*
-
-### Live Trading
-1. Set up MT5 bridge (see above)
-2. Get a trading signal from AI analysis
-3. Click "Place Trade" in the Signal tab
-4. Monitor positions in the Trades tab
-
-## API Integration
-
-The terminal uses:
-- **Anthropic Claude** for AI analysis
-- **MetaTrader 5** for live trading
-- **FastAPI** for the MT5 bridge
-
-## Supported Assets
-
-- **Forex**: XAUUSD, EURUSD, GBPUSD, USDJPY
-- **Crypto**: BTCUSD
-- **Indices**: NAS100, US30
-
-## Technical Details
-
-- **Framework**: Next.js 14 with TypeScript
-- **Styling**: Tailwind CSS with custom trading theme
-- **Charts**: Custom SVG-based charting engine
-- **Real-time**: WebSocket simulation for price updates
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## License
-
-MIT License - feel free to use this project for your trading needs.
-
-## Support
-
-For issues and questions:
-- Open an issue on GitHub
-- Check the MT5 bridge logs for connection problems
-
----
-
-**⚠️ Risk Warning**: Trading involves substantial risk. This tool is for educational and analysis purposes only. Always do your own research before making trading decisions.
