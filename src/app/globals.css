@@ -1,226 +1,97 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
+/* Theme tokens. Light is the base; dark applies via data-theme (set before paint by the
+   script in layout.tsx) or, without JS, via the system preference. Keep in sync with src/lib/theme.ts. */
 :root {
-  /* Neural Trading Terminal - Dark AI Theme */
-  --bg-primary: #0f0f0f;
-  --bg-secondary: #1a1a1a;
-  --bg-tertiary: #252525;
-  --bg-card: #1a1a1a;
-  --bg-hover: #2a2a2a;
-  
-  /* Neural Accent Colors */
-  --neural-cyan: #00f5ff;
-  --neural-cyan-dim: rgba(0, 245, 255, 0.1);
-  --neural-cyan-glow: rgba(0, 245, 255, 0.3);
-  --neural-purple: #bf5af2;
-  --neural-amber: #ff9f0a;
-  
-  /* Trading Colors */
-  --bullish: #22c55e;
-  --bearish: #ef4444;
-  --neutral: #6b7280;
-  
-  /* Text Colors */
-  --text-primary: #ffffff;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
-  --text-dim: #4b5563;
-  
-  /* Borders */
-  --border-primary: #00f5ff;
-  --border-dim: rgba(0, 245, 255, 0.1);
-  --border-hover: rgba(0, 245, 255, 0.2);
-  
-  /* Glow Effects */
-  --glow-cyan: 0 0 20px rgba(0, 245, 255, 0.5);
-  --glow-cyan-sm: 0 0 10px rgba(0, 245, 255, 0.3);
-  
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
-  
-  /* Border Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-full: 9999px;
+  --bg: #ffffff;
+  --panel: #f8f9fa;
+  --raised: #eff1f3;
+  --line: #e3e5e9;
+  --line-strong: #cdd1d7;
+  --ink: #16181c;
+  --muted: #5b6070;
+  --faint: #8d92a0;
+  --accent: #2962ff;
+  --up: #089981;
+  --down: #f23645;
+  --warn: #a86400;
+  color-scheme: light;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+:root[data-theme='dark'] {
+  --bg: #121315;
+  --panel: #18191c;
+  --raised: #232428;
+  --line: #2a2c31;
+  --line-strong: #3a3c42;
+  --ink: #dcdde0;
+  --muted: #9a9ca3;
+  --faint: #686b73;
+  --accent: #4f86ff;
+  --up: #22ab94;
+  --down: #f7525f;
+  --warn: #e0a030;
+  color-scheme: dark;
 }
 
-html {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 14px;
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #121315;
+    --panel: #18191c;
+    --raised: #232428;
+    --line: #2a2c31;
+    --line-strong: #3a3c42;
+    --ink: #dcdde0;
+    --muted: #9a9ca3;
+    --faint: #686b73;
+    --accent: #4f86ff;
+    --up: #22ab94;
+    --down: #f7525f;
+    --warn: #e0a030;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-up: var(--up);
+  --color-down: var(--down);
+  --color-warn: var(--warn);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+html,
+body {
   height: 100%;
-  background: var(--bg-primary);
+  background: var(--bg);
+  color: var(--ink);
 }
 
 body {
-  height: 100%;
-  background: var(--bg-primary);
-  color: var(--text-primary);
   overflow: hidden;
-}
-
-/* Neural Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-dim);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--neural-cyan-dim);
-}
-
-/* Neural Typography */
-.neural-glow {
-  text-shadow: 0 0 20px var(--neural-cyan);
-}
-
-.neural-glow-sm {
-  text-shadow: 0 0 10px var(--neural-cyan);
-}
-
-/* Neural Buttons */
-.btn-neural {
-  background: var(--neural-cyan);
-  color: #000;
-  border: none;
-  border-radius: var(--radius-lg);
-  padding: 10px 20px;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: var(--glow-cyan-sm);
-}
-
-.btn-neural:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--glow-cyan);
-  filter: brightness(1.1);
-}
-
-.btn-secondary {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-dim);
-  border-radius: var(--radius-lg);
-  padding: 10px 20px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background: var(--bg-hover);
-  border-color: var(--neural-cyan);
-}
-
-/* Neural Cards */
-.neural-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-dim);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-}
-
-/* Neural Inputs */
-.input-neural {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-dim);
-  border-radius: var(--radius-lg);
-  color: var(--text-primary);
-  padding: 12px 16px;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  outline: none;
-  width: 100%;
-}
-
-.input-neural:focus {
-  border-color: var(--neural-cyan);
-  box-shadow: 0 0 0 2px var(--neural-cyan-dim);
-}
-
-/* Timeframe Buttons */
-.timeframe-btn {
-  padding: 6px 12px;
-  border-radius: var(--radius-md);
   font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  font-feature-settings: 'cv11', 'ss01';
 }
 
-.timeframe-btn:hover {
-  background: var(--neural-cyan-dim);
-  color: var(--neural-cyan);
-}
-
-.timeframe-btn.active {
-  background: var(--neural-cyan);
-  color: #000;
-}
-
-/* Command Chips */
-.command-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-dim);
-  border-radius: var(--radius-full);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.command-chip:hover {
-  background: var(--neural-cyan);
-  color: #000;
-  border-color: var(--neural-cyan);
-}
-
-/* Price Display */
-.price-display {
-  font-family: ui-monospace, SFMono-Regular, monospace;
-  font-weight: 600;
+.num {
   font-variant-numeric: tabular-nums;
 }
 
-.price-up { color: var(--bullish); }
-.price-down { color: var(--bearish); }
-
-/* Animations */
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
 }
 
-.animate-pulse {
-  animation: pulse 2s infinite;
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
